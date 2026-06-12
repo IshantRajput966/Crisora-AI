@@ -1,0 +1,101 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
+import { ProtectedRoute, RoleRoute, AppLayout } from './components/Layout';
+
+import { Toaster } from 'react-hot-toast';
+import { LoginPage, RegisterPage, CitizenApp } from './pages';
+
+// Placeholder Pages - typically you'd import these from './pages'
+const CollectorDashboard = () => <div className="p-8"><h1 className="text-2xl font-bold text-risk-yellow">Collector Dashboard</h1></div>;
+const AuthorityDashboard = () => <div className="p-8"><h1 className="text-2xl font-bold text-risk-red">Authority Dashboard</h1></div>;
+
+// Component to handle root redirect based on authentication and role
+const RootRedirect = () => {
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-slate-900 flex items-center justify-center">Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  switch (user?.role) {
+    case 'citizen':
+      return <Navigate to="/citizen" replace />;
+    case 'collector':
+      return <Navigate to="/collector" replace />;
+    case 'district_authority':
+    case 'state_authority':
+    case 'ndma':
+      return <Navigate to="/authority" replace />;
+    default:
+      // Fallback if role is unknown
+      return <Navigate to="/login" replace />;
+  }
+};
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Root redirect handles the routing logic based on auth/role state */}
+      <Route path="/" element={<RootRedirect />} />
+      
+      {/* Public Routes */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      
+      {/* Protected Layout Route */}
+      <Route element={
+        <ProtectedRoute>
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        </ProtectedRoute>
+      }>
+        {/* Dashboards inside the Layout */}
+        <Route path="/citizen/*" element={
+          <RoleRoute allowedRoles={['citizen']}>
+            <CitizenApp />
+          </RoleRoute>
+        } />
+        
+        <Route path="/collector/*" element={
+          <RoleRoute allowedRoles={['collector']}>
+            <CollectorDashboard />
+          </RoleRoute>
+        } />
+        
+        <Route path="/authority/*" element={
+          <RoleRoute allowedRoles={['district_authority', 'state_authority', 'ndma']}>
+            <AuthorityDashboard />
+          </RoleRoute>
+        } />
+      </Route>
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <SocketProvider>
+        <BrowserRouter>
+          <Toaster position="top-right" toastOptions={{
+            style: {
+              background: '#1e293b',
+              color: '#fff',
+              border: '1px solid #334155'
+            }
+          }} />
+          <AppRoutes />
+        </BrowserRouter>
+      </SocketProvider>
+    </AuthProvider>
+  );
+}
+
+export default App;

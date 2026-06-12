@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-risk-green: #16a34a;
+  --color-risk-yellow: #ca8a04;
+  --color-risk-orange: #ea580c;
+  --color-risk-red: #dc2626;
+  --color-bg-dark: #0f172a;
+  --color-bg-card: #1e293b;
+  --color-border: #334155;
+}
+
+body {
+  background-color: var(--color-bg-dark);
+  color: #f8fafc;
+  margin: 0;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
