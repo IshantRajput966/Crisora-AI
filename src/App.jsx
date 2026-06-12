@@ -5,11 +5,7 @@ import { SocketProvider } from './context/SocketContext';
 import { ProtectedRoute, RoleRoute, AppLayout } from './components/Layout';
 
 import { Toaster } from 'react-hot-toast';
-import { LoginPage, RegisterPage, CitizenApp } from './pages';
-
-// Placeholder Pages - typically you'd import these from './pages'
-const CollectorDashboard = () => <div className="p-8"><h1 className="text-2xl font-bold text-risk-yellow">Collector Dashboard</h1></div>;
-const AuthorityDashboard = () => <div className="p-8"><h1 className="text-2xl font-bold text-risk-red">Authority Dashboard</h1></div>;
+import { LoginPage, RegisterPage, CitizenApp, AIAssistantPage, CollectorDashboard, AuthorityPanel, SimulationLab } from './pages';
 
 // Component to handle root redirect based on authentication and role
 const RootRedirect = () => {
@@ -57,21 +53,33 @@ function AppRoutes() {
         </ProtectedRoute>
       }>
         {/* Dashboards inside the Layout */}
-        <Route path="/citizen/*" element={
+        <Route path="/citizen" element={
           <RoleRoute allowedRoles={['citizen']}>
             <CitizenApp />
           </RoleRoute>
         } />
         
-        <Route path="/collector/*" element={
+        <Route path="/citizen/ai" element={
+          <RoleRoute allowedRoles={['citizen']}>
+            <AIAssistantPage />
+          </RoleRoute>
+        } />
+        
+        <Route path="/collector" element={
           <RoleRoute allowedRoles={['collector']}>
             <CollectorDashboard />
           </RoleRoute>
         } />
         
-        <Route path="/authority/*" element={
+        <Route path="/authority" element={
           <RoleRoute allowedRoles={['district_authority', 'state_authority', 'ndma']}>
-            <AuthorityDashboard />
+            <AuthorityPanel />
+          </RoleRoute>
+        } />
+        
+        <Route path="/authority/simulation" element={
+          <RoleRoute allowedRoles={['district_authority', 'state_authority', 'ndma']}>
+            <SimulationLab />
           </RoleRoute>
         } />
       </Route>

@@ -1,1 +1,1 @@
-// Export AIChat components here
+export { default as AIChat } from './AIChat';
